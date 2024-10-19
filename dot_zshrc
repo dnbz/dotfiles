@@ -1,0 +1,214 @@
+# -*-sh-*-
+# grml-zshrc is a good default zsh configuration
+source "$HOME/.config/zsh/grml-zshrc"
+
+### ZSH Config ###
+# report about the state of background jobs
+setopt notify
+
+# only alphanumeric characters are considered part of the word so alt+b, ctrl+backspace stop at special characters
+autoload -U select-word-style
+select-word-style bash
+
+# don't show username@hostname on prompt
+zstyle ':prompt:grml:left:setup' items rc change-root path percent
+
+### Keybinds ###
+bindkey '^]' edit-command-line
+
+
+### MacOS specific stuff
+# Needed these shenanigans for mosh to work on MacOS
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+
+# 1password ssh integration
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+
+### Dev env setup ###
+## ruby
+GEM_HOME="$(ruby -e 'puts Gem.user_dir')"
+
+## go
+export GOPATH="$HOME/go"
+
+## python
+export PIPX_BIN_DIR="$HOME/.pipx-bin"
+# debug stuff
+export PYTHONDEBUG=1
+export PYTHONTRACEMALLOC=1
+export PYTHONASYNCIODEBUG=1
+
+### Basic envvars ###
+export EDITOR="nvim"
+
+## History
+HISTSIZE=10000
+SAVEHIST=20000
+
+### Hooks or config loading for external apps
+# fish-like syntax highlighting
+source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# fish-like autosuggestions
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# zoxide to quickly jump into recent directories
+eval "$(zoxide init zsh)"
+
+# direnv for project env
+eval "$(direnv hook zsh)"
+
+# fzf bindings and fuzzy completion
+source <(fzf --zsh)
+
+eval "$(mise activate zsh)"
+
+### Keybinds ###
+bindkey '^Xe' edit-command-line
+
+### PATH ###
+# this can be done via PATH array in zsh, but this version is portable
+pathmunge () {
+    case ":${PATH}:" in
+        *:"$1":*)
+            ;;
+        *)
+            if [ "$2" = "after" ] ; then
+                PATH=$PATH:$1
+            else
+                PATH=$1:$PATH
+            fi
+    esac
+}
+pathmunge "$HOME/.config/emacs/bin"
+pathmunge "$HOME/.local/bin"
+pathmunge "$HOME/.local/mybin"
+pathmunge "$HOME/.cargo/bin"
+pathmunge "$HOME/.deno/bin"
+pathmunge "$HOME/bin"
+pathmunge "$HOME/go/bin"
+pathmunge "$HOME/.pipx-bin"
+pathmunge "$HOME/.composer/vendor/bin"
+pathmunge "$HOME/flutter/bin"
+pathmunge "$HOME/android-studio/bin"
+pathmunge "$HOME/Android/Sdk/platform-tools"
+pathmunge "$HOME/Android/Sdk/cmdline-tools/latest/bin"
+pathmunge "$HOME/Android/Sdk/emulator"
+pathmunge "${KREW_ROOT:-$HOME/.krew}/bin"
+pathmunge "$GEM_HOME/bin"
+export PATH
+
+### Aliases ###
+alias sc="systemctl --user"
+alias ssc="sudo systemctl"
+alias mk="mkdir -pv"
+alias lsbk="sudo lsblk -o NAME,MOUNTPOINT,SIZE,FSUSED,FSTYPE,PTTYPE,RM"
+alias ta="tmux attach"
+alias nb="newsboat"
+alias v="nvim"
+alias dc="docker compose"
+alias d="docker"
+alias tf="terraform"
+alias dcd="docker compose -f docker-compose.dev.yml"
+alias la="ls -lAh"
+alias qrclip="xclip -selection clipboard -o | qrencode -t UTF8"
+alias killplasma="kquitapp5 plasmashell;kstart5 plasmashell"
+alias kc="kubecolor"
+alias kubectl="kubecolor"
+alias ktc="sudo k3s kubectl"
+
+## Defaults
+alias ls="eza"
+alias rm="rm -i"
+alias apk-file="apk-file --arch x86_64"
+alias grep="grep --color=auto"
+# --ctime and --color don't work on Alpine
+alias dmesg="sudo dmesg --ctime --color=always"
+# the predict is awkward
+alias mosh="mosh -no-init -no-predict"
+
+### Functions ###
+# cd && ls
+cdl () {
+  cd $@ && ls
+}
+
+ansrun () {
+  cd ~/sync/code/ansible-server && ansible-playbook local.yml $@ && cd -
+}
+
+histrank() {
+  local lineno="${1:=5}"
+  history 1 | awk '{print $2}' | sort | uniq -c | sort -nr | head --lines "$lineno"
+}
+
+# open w3m on a link from clipboard
+w3mc () {
+  if [[ $WAYLAND_DISPLAY ]];then
+    cliplink="$(wl-paste)"
+  else
+    cliplink="$(xsel -ob)"
+  fi
+  w3m "$cliplink" $@
+}
+
+ikill () {
+  pid="$(ps -ef | sed 1d | fzf --height=15 --reverse)" && kill "$(echo $pid | awk '{print $2}')"
+}
+
+iman () {
+  choice="$(man -k . 2> /dev/null | fzf --height=15)" && man "$(echo $choice | awk '{print $1}' | sed -E 's/\([0-9]\)//;s/,//')"
+}
+
+# Run a command N times
+run () {
+  number=$1
+  shift
+  for i in $(seq $number);do
+    $@
+  done
+}
+
+# show the unicode codepoint for characters in the string
+toutf() {
+  iconv -f utf8 -t utf32le | hexdump -v -e '8/4 "0x%04x " "\n"' | sed -re"s/0x /   /g"
+}
+
+fix () {
+  reset
+  stty sane
+  tput rs1
+  clear
+  echo -en "\e[0m"
+}
+
+# toggle python debug variables
+tpydebug() {
+    unset PYTHONDEBUG
+    unset PYTHONTRACEMALLOC
+    unset PYTHONASYNCIODEBUG
+}
+
+# Prints terminal colors up to specified number
+showcolors () {
+  ColorNr=$@
+  [[ "${@[0]}" == "" ]] && ColorNr=256
+  for (( n=0; n < $ColorNr; n++ )) do
+      printf " [%d] $(tput setaf $n)%s$(tput sgr0)" $n "wMwMwMwMwMwMw
+  "
+  done
+}
+
+# notifies whether the last command was succesful or not
+boop () {
+  local last="$?"
+  local lastcmd="${history[$HISTCMD]%boop}"
+  if [[ "$last" == '0' ]]; then
+    notify-send -i data-information "SUCCESS: $lastcmd" "command finished succesfully"
+  else
+    notify-send -i data-warning "FAIL: $lastcmd" "command returned exit code $?"
+  fi
+  $(exit "$last")
+}

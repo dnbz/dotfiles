@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Check if a tag was provided as an argument
+if [ -z "$1" ]; then
+    echo "Usage: $0 <tag>"
+    exit 1
+fi
+
+# Get the tag from the first argument
+TAG="$1"
+
+# Function to display an error message and exit
+function error_exit {
+    echo "Error: $1"
+    exit 1
+}
+
+# Check if the tag exists locally
+if git show-ref --tags | grep -q "refs/tags/$TAG"; then
+    echo "Tag $TAG found locally."
+else
+    error_exit "Tag $TAG does not exist locally."
+fi
+
+# Delete the local tag
+echo "Deleting local tag $TAG..."
+git tag -d "$TAG" || error_exit "Failed to delete local tag $TAG."
+
+# Recreate the tag with the latest commit
+echo "Recreating tag $TAG with the latest commit..."
+git tag "$TAG" || error_exit "Failed to create tag $TAG."
+
+# Delete the remote tag
+echo "Deleting remote tag $TAG..."
+git push origin --delete "refs/tags/$TAG" || error_exit "Failed to delete remote tag $TAG."
+
+# Push the new tag to the remote repository
+echo "Pushing new tag $TAG to the remote repository..."
+git push origin "$TAG" || error_exit "Failed to push tag $TAG to the remote repository."
+
+echo "Tag $TAG has been successfully repushed."
+
+exit 0

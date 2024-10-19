@@ -1,0 +1,23 @@
+session_name: main
+windows:
+  - options:
+      automatic-rename: on
+  - options:
+      automatic-rename: on
+  - options:
+      automatic-rename: on
+  - options:
+      automatic-rename: on
+
+  - options:
+      automatic-rename: on
+  - options:
+      automatic-rename: on
+  - options:
+      automatic-rename: on
+
+  - options:
+      automatic-rename: on
+  # - window_name: aerc
+  #   panes:
+  #     - aerc

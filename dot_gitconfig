@@ -1,0 +1,12 @@
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = false
+
+[includeIf "gitdir:~/IdeaProjects/"]
+    [user]
+      email = 5652160-nezz1@users.noreply.gitlab.com
+      name = Leo
+[alias]
+	change-commits = "!f() { VAR=$1; OLD=$2; NEW=$3; shift 3; git filter-branch --env-filter \"if [[ \\\"$`echo $VAR`\\\" = '$OLD' ]]; then export $VAR='$NEW'; fi\" $@; }; f"
