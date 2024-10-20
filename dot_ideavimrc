@@ -1,0 +1,150 @@
+set clipboard+=unnamedplus
+set clipboard+=ideaput
+
+" fancy joins(J)
+set ideajoin
+
+set ideavimsupport=
+set iskeyword-=_
+
+set nohlsearch
+set noshowcmd
+
+set cursorline
+set scrolloff=5
+
+let mapleader=" "
+
+Plug 'preservim/nerdtree'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+
+
+" IDEA specific configs
+
+if &ide =~? 'community'
+" some mappings and options for IntelliJ IDEA Community Edition
+elseif &ide =~? 'ultimate'
+    map <leader>c <Action>(ActivatePythonConsoleToolWindow)
+" some mappings and options for IntelliJ IDEA Ultimate Edition
+elseif &ide =~? 'pycharm'
+    map <leader>c <Action>(ActivatePythonConsoleToolWindow)
+endif
+
+nnoremap \e :e ~/.ideavimrc<CR>
+nnoremap \r :action IdeaVim.ReloadVimRc.reload<CR>
+nnoremap <c-z> :action ToggleDistractionFreeMode<CR>
+nnoremap <c-t> :action ActivateTerminalToolWindow<CR>
+nnoremap <leader>t :action Terminal.OpenInTerminal<CR>
+
+map <c-t>   :NERDTree<CR>
+
+
+ " Map \r to the Reformat Code action
+map <leader>r <Action>(ReformatCode)
+map <leader>R <Action>(RecentFiles)
+map <leader>s <Action>(FileStructurePopup)
+
+" Map <leader>d to start debug
+map <leader>d <Action>(Debug)
+
+map / <Action>(Find)
+
+map <leader>t <Action>(ActivateTerminalToolWindow)
+
+map <leader><Space> <Action>(GotoFile)
+
+map <leader>a <Action>(GotoAction)
+map <leader>e <Action>(SearchEverywhere)
+map <leader>g <Action>(FindInPath)
+map <leader>b <Action>(Switcher)
+
+vnoremap gc <Action>(CommentByLineComment)
+vnoremap gC <Action>(CommentByBlockComment)
+
+nnoremap <C-S-=> :action EditorIncreaseFontSizeGlobal<CR>
+nnoremap <C-S--> :action EditorDecreaseFontSizeGlobal<CR>
+
+" nnoremap gd :action GotoDeclaration<CR>
+" nnoremap gs :action GotoSuperMethod<CR>
+" nnoremap gi :action GotoImplementation<CR>
+" nnoremap gb :action JumpToLastChange<CR>
+
+" nnoremap U :action FindUsages<CR>
+" nnoremap R :action RenameElement<CR>
+
+" nnoremap == :action ReformatCode<CR>
+" vnoremap == :action ReformatCode<CR>
+
+" nnoremap cc :action CommentByLineComment<CR>
+" vnoremap cc :action CommentByLineComment<CR>
+
+" nnoremap <C-CR> :action ShowIntentionActions<CR>
+
+" nnoremap ,a :action GotoAction<CR>
+" vnoremap ,a :action GotoAction<CR>
+
+" Perform dot commands over visual blocks:
+vnoremap . :normal .<CR>
+
+" Save a file
+nnoremap <leader>fs :w<CR>
+" Window operations
+nnoremap <leader>wh <C-w>h
+nnoremap <leader>wl <C-w>l
+nnoremap <leader>wj <C-w>j
+nnoremap <leader>wk <C-w>k
+
+nnoremap <leader>wH <C-w>H
+nnoremap <leader>wL <C-w>L
+nnoremap <leader>wJ <C-w>J
+nnoremap <leader>wK <C-w>K
+
+nnoremap <leader>wv <C-w>v
+nnoremap <leader>ws <C-w>s
+
+nnoremap <leader>w< <C-w><
+nnoremap <leader>w> <C-w>>
+
+nnoremap <leader>wc :tabclose<CR>
+map <C-w> <Action>(CloseContent)
+
+" Tabs
+nnoremap <A-n> :tabn<CR>
+nnoremap <A-p> :tabp<CR>
+
+gnoremap <C-1> :tabn 1<CR>
+nnoremap <C-2> :tabn 2<CR>
+nnoremap <C-3> :tabn 3<CR>
+nnoremap <C-4> :tabn 4<CR>
+nnoremap <C-5> :tabn 5<CR>
+nnoremap <C-6> :tabn 6<CR>
+nnoremap <C-7> :tabn 7<CR>
+nnoremap <C-8> :tabn 8<CR>
+nnoremap <C-9> :tabn 9<CR>
+
+" Alt+hjkl in insert mode
+inoremap <A-h> <left>
+inoremap <A-j> <down>
+inoremap <A-k> <up>
+inoremap <A-l> <right>
+" Readline
+inoremap <C-f> <right>
+inoremap <C-b> <left>
+inoremap <C-a> <Home>
+inoremap <C-e> <End>
+inoremap <A-b> <C-Left>
+inoremap <A-f> <C-Right>
+inoremap <C-BS> <C-W>
+cnoremap <C-f> <right>
+cnoremap <C-b> <left>
+cnoremap <C-a> <Home>
+cnoremap <C-e> <End>
+cnoremap <A-b> <C-Left>
+cnoremap <A-f> <C-Right>
+cnoremap <C-BS> <C-W>
+
+unmap <C-p>
+unmap <C-n>
+
+inoremap jk <Esc>%
